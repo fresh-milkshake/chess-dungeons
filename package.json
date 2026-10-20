@@ -1,0 +1,15 @@
+{
+  "name": "chess-dungeons",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/copy-engine.mjs && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test"
+  },
+  "dependencies": { "chess.js": "1.4.0", "stockfish": "19.0.1" },
+  "devDependencies": { "vite": "^7.1.0" }
+}

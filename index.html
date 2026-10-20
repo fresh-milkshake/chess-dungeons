@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#201f1c" />
+    <meta name="description" content="Chess Dungeons — классические шахматы в браузере. Играйте вдвоём или против Stockfish." />
+    <title>Chess Dungeons — шахматы</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="header">
+      <a class="brand" href="./" aria-label="Chess Dungeons — главная"><span class="brand-mark">♜</span><span>CHESS <b>DUNGEONS</b></span></a>
+      <span class="edition"><span></span> КЛАССИЧЕСКИЕ ШАХМАТЫ</span>
+      <a class="source-link" href="https://github.com/fresh-milkshake/chess-dungeons" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </header>
+    <main class="game-layout">
+      <section class="arena" aria-label="Шахматная партия">
+        <div class="player player-top"><div class="avatar dark-avatar">♟</div><div><strong id="black-name">Чёрные</strong><small id="black-detail">За одной доской</small></div><span class="turn-marker" id="black-turn">Ходят</span><div class="captured" id="black-captured"></div></div>
+        <div class="board-row" id="board-row">
+          <div class="evaluation" id="evaluation" role="meter" aria-label="Оценка позиции в пользу белых" aria-valuemin="-10" aria-valuemax="10" aria-valuenow="0"><div class="eval-white" id="eval-white"></div><span id="eval-number">0.0</span></div>
+          <div id="board" class="board" role="group" aria-label="Шахматная доска"></div>
+        </div>
+        <div class="player player-bottom"><div class="avatar light-avatar">♙</div><div><strong>Белые</strong><small id="white-detail">За одной доской</small></div><span class="turn-marker" id="white-turn">Ходят</span><div class="captured" id="white-captured"></div></div>
+        <div class="board-footer"><span id="board-hint">Выберите фигуру, чтобы увидеть ходы</span><button id="flip" class="text-button" title="Перевернуть доску">⇅ <span>Перевернуть</span></button></div>
+      </section>
+      <aside class="sidebar">
+        <div class="chapter"><span>01 /</span> НАЧАЛО ПУТИ</div>
+        <h1>Каждая партия —<br>новая история.</h1>
+        <p class="intro">Знакомые правила. Чистая доска.<br>Ваш следующий ход.</p>
+        <section class="game-panel">
+          <div class="panel-label">ПАРТИЯ <span class="live-dot"></span></div>
+          <h2 id="status" aria-live="polite">Ход белых</h2>
+          <label class="mode-label" for="mode">Соперник</label>
+          <select id="mode"><option value="local">Друг за одной доской</option><option value="engine">Stockfish · вы за белых</option></select>
+          <div class="moves-heading"><span>ХОДЫ</span><span id="move-count">0</span></div>
+          <div class="move-list" id="move-list" aria-label="История ходов"><div class="empty-moves">История начинается с первого хода.</div></div>
+          <div class="game-actions"><button id="undo" class="secondary-button" disabled>↶ &nbsp; Назад</button><button id="new-game" class="primary-button">Новая партия <span>↗</span></button></div>
+        </section>
+        <section class="settings" aria-label="Настройки"><label class="toggle-row" for="show-eval"><span>Шкала преимущества<small id="engine-status" aria-live="polite">Stockfish · загрузка…</small></span><input id="show-eval" type="checkbox" role="switch" checked /><span class="switch-track" aria-hidden="true"></span></label></section>
+        <p class="footnote">Сначала — шахматы.<br><span>Подземелья появятся чуть позже.</span></p>
+      </aside>
+    </main>
+    <dialog id="promotion"><h2>Превращение пешки</h2><p>Выберите новую фигуру</p><div class="promotion-options"></div></dialog>
+    <dialog id="restart"><h2>Начать заново?</h2><p>Текущая партия будет завершена.</p><div class="dialog-actions"><button id="cancel-restart" class="secondary-button">Продолжить</button><button id="confirm-restart" class="primary-button">Новая партия</button></div></dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
