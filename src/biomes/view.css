@@ -1,0 +1,19 @@
+.terrain-effect{position:absolute!important;inset:0;width:100%!important;height:100%!important;pointer-events:none;z-index:1;object-fit:fill}
+.garden-decoration{position:absolute;inset:4%;background:center/contain no-repeat;opacity:.57;pointer-events:none;z-index:1}
+.act-entry-intro{background:#08090bb8}
+.terrain-effect[data-rooted=true]{z-index:8}
+.square>.piece-sprite,.square>img,.map-cell>.piece-sprite,.map-cell>img,.square>canvas.piece-shader,.map-cell>canvas.piece-shader{position:relative;z-index:3}
+.square.biome-hole,.map-cell.biome-hole{background:transparent!important;box-shadow:none!important;border-color:transparent!important}
+.biome-hole:before,.biome-hole:after{display:none!important}
+.square.biome-hole>*:not(.terrain-effect),.map-cell.biome-hole>*:not(.terrain-effect){position:relative;z-index:3}
+.biome-hole>.coordinate,.biome-hole>.move-hint,.biome-hole>.capture-hint{display:none!important}
+.square.biome-hole{pointer-events:none;cursor:default}
+.has-board-outline{isolation:isolate;overflow:visible!important;box-shadow:none!important;border-radius:0!important}
+.board.has-board-outline{position:relative}
+.board-outline{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:-1;filter:drop-shadow(0 12px 22px #0004)}
+.board-outline path{fill:var(--light)}
+
+/* Moving sprites must cross above neighbouring terrain stacking contexts. */
+.square.moving-piece{z-index:20}
+.square>.terrain-effect,.map-cell>.terrain-effect{z-index:0}
+.square>.terrain-effect[data-rooted=true],.map-cell>.terrain-effect[data-rooted=true]{z-index:8}

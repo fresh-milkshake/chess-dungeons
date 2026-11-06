@@ -1,0 +1,6 @@
+/* One opaque colour; only faces adjoining floor receive relief. */
+.map-cell.wall{background:var(--wall,#454640);background-image:none;border:0;outline:0;box-shadow:0 0 0 .65px var(--wall,#454640);--edge-n:transparent;--edge-e:transparent;--edge-s:transparent;--edge-w:transparent;cursor:default}
+.map-cell.wall::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(var(--edge-n),var(--edge-n)) top/100% 3px no-repeat,linear-gradient(var(--edge-e),var(--edge-e)) right/3px 100% no-repeat,linear-gradient(var(--edge-s),var(--edge-s)) bottom/100% 3px no-repeat,linear-gradient(var(--edge-w),var(--edge-w)) left/3px 100% no-repeat}
+.map-cell.wall-n{--edge-n:color-mix(in srgb,var(--light) 33%,transparent)}.map-cell.wall-e{--edge-e:#0005}.map-cell.wall-s{--edge-s:#0007}.map-cell.wall-w{--edge-w:#0005}
+.map-cell.wall.memory{filter:brightness(.48) saturate(.45)}
+.map-cell.weak-patrol .enemy-marker{color:#e3ce9b}

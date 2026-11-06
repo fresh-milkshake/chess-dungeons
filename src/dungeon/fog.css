@@ -1,0 +1,3 @@
+.map-fog{position:absolute;left:-96px;top:-96px;z-index:24;pointer-events:none;image-rendering:auto;transform-origin:0 0;will-change:transform}.map-fog[hidden]{display:none}
+/* The continuous mask owns dimming; changing a cell's state must not flash it. */
+.fog-active .map-cell.floor.memory,.fog-active .map-cell.wall.memory{filter:none}

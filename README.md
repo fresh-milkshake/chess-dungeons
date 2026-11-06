@@ -1,45 +1,40 @@
+<p align="left"><img src="public/favicon.svg" width="72" alt="Chess Dungeons"></p>
+
 # Chess Dungeons
 
-Классические шахматы в браузере — основа для будущего roguelike.
+Браузерный шахматный рогалик. Исследуйте подземелья, собирайте отряд и артефакты, расставляйте фигуры и сражайтесь с противниками. Есть и классические шахматы для двоих или против Stockfish.
 
-## Возможности
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![WebAssembly](https://img.shields.io/badge/WebAssembly-654FF0?style=for-the-badge&logo=webassembly&logoColor=white)
 
-- Игра вдвоём за одной доской или за белых против Stockfish 19 lite.
-- Ходы кликом и перетаскиванием мышью / пальцем, подсветка допустимых ходов и взятий.
-- Рокировка, взятие на проходе, выбор фигуры при превращении, шах, мат и ничьи.
-- Отключаемая шкала оценки Stockfish, включённая по умолчанию. Оценка со стороны белых, в единицах пешки.
-- История, отмена хода, переворот, сохранение текущей партии и настроек в localStorage.
-- Адаптивный интерфейс и управление доской с клавиатуры (стрелки, Enter/Space).
+[Играть в Chess Dungeons](https://fresh-milkshake.github.io/chess-dungeons/dungeon.html) · [Классические шахматы](https://fresh-milkshake.github.io/chess-dungeons/)
 
-По сети с другом пока играть нельзя. Времени на ход и roguelike-механик пока нет. Троекратное повторение и правило 50 ходов автоматически завершают партию как ничью.
+| Подземелье | Бой |
+|:---:|:---:|
+| <img src="docs/screenshots/dungeon.webp" width="460" alt="Исследование подземелья"> | <img src="docs/screenshots/battle.webp" width="460" alt="Шахматный бой"> |
 
-## Разработка
+## Запуск
 
-Node.js 22+:
+Node.js 22.12+ и Emscripten. В Windows для сборки движка используется Ubuntu в WSL.
 
 ```sh
 npm ci
+npm run build:lab
 npm run build
 npm run dev
 ```
 
-Перед первым `dev` выполните `build`: он копирует движок из npm-пакета в `public/engine`. `npm test` проверяет отмену устаревших расчётов и преобразование оценок. `npm run preview` открывает собранную версию.
+Кампания открывается на `/dungeon.html`. На карте WASD или стрелки двигают короля, Enter подтверждает действие, колесо меняет масштаб.
 
-## GitHub Pages
+Проверки и сборка сайта · `npm test` · `npm run test:lab` · `npm run build:pages`.
 
-Workflow `.github/workflows/pages.yml` собирает и публикует `dist` при push в `main`. В настройках репозитория Pages должен быть выбран источник **GitHub Actions**. Относительные URL поддерживают размещение в подпапке репозитория.
+[Устройство кампании](docs/DUNGEON-DESIGN.md) · [Движок и сборка](engine/README.md) · [Документация игры](docs/)
 
-Stockfish запускается локально в Web Worker, без серверного API. Используется однопоточная WASM-сборка: ей не нужны COOP/COEP и SharedArrayBuffer. При недоступности движка игра вдвоём продолжает работать; шкала показывает прочерк.
+## Автор и лицензия
 
-## Будущие варианты
+[fresh-milkshake](https://github.com/fresh-milkshake) · [GPL-3.0-or-later](LICENSE).
 
-Правила сейчас предоставляет chess.js, оценку — обычный Stockfish. Новые фигуры потребуют согласованного изменения правил интерфейса и движка. Для расширенных ходов и новых фигур подходит [Fairy-Stockfish](https://fairy-stockfish.github.io/custom-variants/): многие варианты описываются в `variants.ini` с помощью Betza. Особые способности, случайные эффекты или изменение правил на каждом ходу могут потребовать изменений исходников и отдельной оценки силы движка.
+Движки · [Fairy-Stockfish и патчи](engine/) · [Stockfish.js 19.0.1 и исходники](https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.1). [Лицензия chess.js](public/licenses/chess-js-BSD-2-Clause.txt).
 
-## Лицензии и исходники
-
-Проект распространяется под GPL-3.0-or-later, см. `LICENSE`.
-
-- [Stockfish.js 19.0.1](https://github.com/nmrugg/stockfish.js/tree/v19.0.1), GPL-3.0. Немодифицированные `stockfish-19-lite-single.js/.wasm` берутся из закреплённого npm-пакета `stockfish@19.0.1`. [Соответствующий архив исходников и инструкции сборки](https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.1). Лицензия также доступна в `/licenses/stockfish-GPL-3.0.txt` относительно корня приложения.
-- [chess.js 1.4.0](https://github.com/jhlywa/chess.js), BSD-2-Clause. Копия лицензии: `public/licenses/chess-js-BSD-2-Clause.txt`.
-- SVG-фигуры **Cburnett**, Colin M. L. Burnett, GPL-2.0-or-later, из [набора Lichess](https://github.com/lichess-org/lila/tree/master/public/piece/cburnett). Это самостоятельный открытый набор, не графика Chess.com.
-- Golos Text и Unbounded — Google Fonts, SIL Open Font License. При недоступности Google Fonts используются системные запасные шрифты.
+У материалов свои правообладатели и условия · [фигуры Neo](public/pieces/ATTRIBUTION.md) · [звук хода](public/sounds/ATTRIBUTION.md) · [музыка](public/audio/CREDITS.md) · [шрифты](public/fonts/cormorant-sc/OFL.txt).

@@ -1,6 +1,12 @@
+import {mountSoundControls} from './audio/controls.js';
+mountSoundControls();
+import './game-input.js';
 import { Chess } from 'chess.js';
 import { Engine } from './engine.js';
 import { enableBoardDrag } from './board-drag.js';
+import { pieceSets, defaultPieceSet, pieceImage } from './piece-sets.js';
+import { minElo, maxElo, defaultElo, nativeMinElo, normalizeElo, chooseOpponentMove } from './engine-strength.js';
+import { createMoveAnimation, createMoveSound } from './move-effects.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -10,9 +16,14 @@ let selected = null;
 let targets = [];
 let flipped = false;
 let mode = 'local';
+let pieceSet = defaultPieceSet;
+let engineElo = defaultElo;
 let pendingPromotion = null;
 let engineFailed = false;
 let readyToRender = false;
+let undoBusy=false;
+const moveAnimation = createMoveAnimation($('board'));
+const moveSound = createMoveSound(() => $('sound-enabled').checked);
 
 try {
   const saved = JSON.parse(localStorage.getItem('chess-dungeons-v1'));
@@ -20,22 +31,58 @@ try {
     if (saved.pgn) game.loadPgn(saved.pgn);
     mode = saved.mode === 'engine' ? 'engine' : 'local';
     flipped = !!saved.flipped;
+    if (pieceSets.some(({ id }) => id === saved.pieceSet)) pieceSet = saved.pieceSet;
+    engineElo = normalizeElo(saved.engineElo);
     $('show-eval').checked = saved.showEval !== false;
+    $('sound-enabled').checked = saved.soundEnabled !== false;
   }
 } catch { game.reset(); }
 $('mode').value = mode;
+for (const input of [$('elo'), $('elo-range')]) {
+  input.min = String(minElo);
+  input.max = String(maxElo);
+}
 
 function save() {
   try {
-    localStorage.setItem('chess-dungeons-v1', JSON.stringify({ pgn: game.pgn(), mode, flipped, showEval: $('show-eval').checked }));
+    localStorage.setItem('chess-dungeons-v1', JSON.stringify({ pgn: game.pgn(), mode, flipped, pieceSet, engineElo, soundEnabled: $('sound-enabled').checked, showEval: $('show-eval').checked }));
   } catch { /* Private browsing can disable storage; the current game still works. */ }
 }
 
 function imageFor(piece) {
-  return `${import.meta.env.BASE_URL}pieces/${piece.color}${piece.type.toUpperCase()}.svg`;
+  return pieceImage(piece, pieceSet, import.meta.env.BASE_URL);
+}
+
+function setupPieceSets() {
+  for (const set of pieceSets) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'piece-set';
+    button.dataset.pieceSet = set.id;
+    button.setAttribute('aria-label', `${set.name} · ${set.detail}`);
+    const preview = document.createElement('span');
+    preview.className = 'piece-set-preview';
+    preview.setAttribute('aria-hidden', 'true');
+    for (const piece of [{ color: 'w', type: 'n' }, { color: 'b', type: 'q' }]) {
+      const img = document.createElement('img');
+      img.src = pieceImage(piece, set.id, import.meta.env.BASE_URL);
+      img.alt = '';
+      img.draggable = false;
+      preview.append(img);
+    }
+    const name = document.createElement('span');
+    name.className = 'piece-set-name';
+    name.textContent = set.name;
+    const detail = document.createElement('small');
+    detail.textContent = set.detail;
+    button.append(preview, name, detail);
+    button.addEventListener('click', () => { pieceSet = set.id; render(); });
+    $('piece-sets').append(button);
+  }
 }
 
 function renderBoard() {
+  moveAnimation.cancel();
   const files = flipped ? 'hgfedcba' : 'abcdefgh';
   const ranks = flipped ? '12345678' : '87654321';
   const lastMove = game.history({ verbose: true }).at(-1);
@@ -145,15 +192,26 @@ function render() {
   renderHistory();
   renderCaptured();
   $('status').textContent = statusText();
-  $('undo').disabled = !game.history().length;
+  $('undo').disabled = undoBusy || !game.history().length;
+  for(const id of ['flip','new-game','mode','elo','elo-range','show-eval','sound-enabled'])$(id).disabled=undoBusy;
   $('white-turn').hidden = game.turn() !== 'w' || game.isGameOver();
   $('black-turn').hidden = game.turn() !== 'b' || game.isGameOver();
   $('black-name').textContent = mode === 'engine' ? 'Stockfish' : 'Чёрные';
-  $('black-detail').textContent = mode === 'engine' ? 'Движок · версия 19 lite' : 'За одной доской';
+  $('black-detail').textContent = mode === 'engine' ? `${engineElo < nativeMinElo ? 'Учебный режим' : 'Stockfish 19 lite'} · ${engineElo} Elo` : 'За одной доской';
   $('white-detail').textContent = mode === 'engine' ? 'Вы играете белыми' : 'За одной доской';
   $('board-hint').textContent = game.isGameOver() ? 'Партия завершена' : selected ? 'Выберите подсвеченную клетку' : 'Выберите фигуру, чтобы увидеть ходы';
   $('evaluation').hidden = !$('show-eval').checked;
   $('evaluation').classList.toggle('flipped', flipped);
+  $('engine-strength').hidden = mode !== 'engine' || engineFailed;
+  $('elo').value = String(engineElo);
+  $('elo-range').value = String(engineElo);
+  $('elo-note').textContent = engineElo < nativeMinElo
+    ? 'Учебный режим с дополнительными ошибками. Elo — условная сложность.'
+    : 'Целевая сила движка, приблизительный рейтинг.';
+  for (const button of $('piece-sets').children) {
+    button.disabled=undoBusy;
+    button.setAttribute('aria-pressed', String(button.dataset.pieceSet === pieceSet));
+  }
   save();
 }
 
@@ -179,10 +237,11 @@ const engine = new Engine({
     if (readyToRender) render();
   },
   onMove: (uci, fen) => {
-    if (mode !== 'engine' || game.fen() !== fen || game.turn() !== 'b' || game.isGameOver()) return;
+    if (undoBusy || mode !== 'engine' || game.fen() !== fen || game.turn() !== 'b' || game.isGameOver()) return;
     try {
-      game.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] });
-      changed();
+      const legalMoves = game.moves({ verbose: true }).map((move) => `${move.from}${move.to}${move.promotion ?? ''}`);
+      const chosen = chooseOpponentMove(uci, legalMoves, engineElo);
+      playMove({ from: chosen.slice(0, 2), to: chosen.slice(2, 4), promotion: chosen[4] });
     } catch { $('engine-status').textContent = 'Не удалось получить ход · переключитесь на игру вдвоём'; }
   },
 });
@@ -190,7 +249,7 @@ const engine = new Engine({
 function analyze() {
   if (engineFailed) return;
   if (game.isGameOver()) updateScore({ type: 'cp', value: 0 });
-  engine.request(game.fen(), mode === 'engine' && game.turn() === 'b' && !game.isGameOver());
+  engine.request(game.fen(), mode === 'engine' && game.turn() === 'b' && !game.isGameOver(), engineElo);
 }
 
 function changed() {
@@ -200,8 +259,16 @@ function changed() {
   analyze();
 }
 
-function chooseSquare(square) {
-  if (game.isGameOver() || pendingPromotion || (mode === 'engine' && game.turn() === 'b')) return;
+function playMove(move, animate = true) {
+  const before = animate ? moveAnimation.snapshot() : null;
+  const result = game.move(move);
+  changed();
+  if (before) moveAnimation.play(result, before);
+  moveSound.play();
+}
+
+function chooseSquare(square, animate = true) {
+  if (undoBusy || game.isGameOver() || pendingPromotion || (mode === 'engine' && game.turn() === 'b')) return;
   const move = targets.find((candidate) => candidate.to === square);
   if (selected && move) {
     if (move.promotion) {
@@ -216,18 +283,17 @@ function chooseSquare(square) {
         img.alt = pieceNames[type];
         button.append(img);
         button.onclick = () => {
-          game.move({ ...pendingPromotion, promotion: type });
+          const promotedMove = { ...pendingPromotion, promotion: type };
           pendingPromotion = null;
           $('promotion').close();
-          changed();
+          playMove(promotedMove, animate);
         };
         options.append(button);
       }
       $('promotion').showModal();
       return;
     }
-    game.move({ from: selected, to: square });
-    changed();
+    playMove({ from: selected, to: square }, animate);
     return;
   }
   if (selected === square) selected = null;
@@ -239,7 +305,7 @@ function chooseSquare(square) {
 const suppressDragClick = enableBoardDrag({
   board: $('board'),
   canDrag: (square) => {
-    if (game.isGameOver() || pendingPromotion || (mode === 'engine' && game.turn() === 'b')) return null;
+    if (undoBusy || game.isGameOver() || pendingPromotion || (mode === 'engine' && game.turn() === 'b')) return null;
     const piece = game.get(square);
     return piece?.color === game.turn() ? piece : null;
   },
@@ -248,7 +314,7 @@ const suppressDragClick = enableBoardDrag({
     targets = game.moves({ square, verbose: true });
     render();
   },
-  drop: chooseSquare,
+  drop: (square) => chooseSquare(square, false),
   imageFor,
   onCancel: () => { selected = null; targets = []; render(); },
 });
@@ -267,13 +333,36 @@ $('board').addEventListener('keydown', (event) => {
   squares[Math.max(0, Math.min(63, index + keys[event.key]))]?.focus();
 });
 $('promotion').addEventListener('cancel', () => { pendingPromotion = null; });
+$('board').addEventListener('pointerdown', moveSound.unlock, { capture: true });
+$('board').addEventListener('keydown', moveSound.unlock, { capture: true });
+$('mode').addEventListener('pointerdown', moveSound.unlock);
+$('mode').addEventListener('keydown', moveSound.unlock);
+$('sound-enabled').addEventListener('change', () => {
+  if ($('sound-enabled').checked) moveSound.unlock();
+  else moveSound.stop();
+  save();
+});
 $('show-eval').addEventListener('change', render);
 $('flip').addEventListener('click', () => { flipped = !flipped; render(); });
 $('mode').addEventListener('change', () => { mode = $('mode').value; changed(); });
-$('undo').addEventListener('click', () => {
-  game.undo();
-  if (mode === 'engine' && game.turn() === 'b') game.undo();
-  changed();
+$('elo-range').addEventListener('input', () => { $('elo').value = $('elo-range').value; });
+for (const input of [$('elo'), $('elo-range')]) {
+  input.addEventListener('change', () => {
+    const nextElo = normalizeElo(input.valueAsNumber, engineElo);
+    const changedStrength = nextElo !== engineElo;
+    engineElo = nextElo;
+    render();
+    if (changedStrength && mode === 'engine' && game.turn() === 'b' && !game.isGameOver()) analyze();
+  });
+}
+$('undo').addEventListener('click', async () => {
+  if(undoBusy)return;undoBusy=true;selected=null;targets=[];
+  try{
+    do{
+      const before=moveAnimation.snapshot(),move=game.undo();render();
+      if(move)await moveAnimation.undo(move,before);
+    }while(mode==='engine'&&game.turn()==='b'&&game.history().length);
+  }finally{undoBusy=false;changed();}
 });
 $('new-game').addEventListener('click', () => {
   if (game.history().length && !game.isGameOver()) $('restart').showModal();
@@ -282,6 +371,7 @@ $('new-game').addEventListener('click', () => {
 $('cancel-restart').addEventListener('click', () => $('restart').close());
 $('confirm-restart').addEventListener('click', () => { $('restart').close(); game.reset(); changed(); });
 readyToRender = true;
+setupPieceSets();
 if (engineFailed) { mode = 'local'; $('mode').value = mode; }
 render();
 analyze();

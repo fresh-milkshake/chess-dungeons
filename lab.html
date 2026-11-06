@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chess Dungeons · Лаборатория</title><link rel="icon" href="./favicon.svg"></head>
+<body class="lab-page">
+  <header class="header"><a class="source-link" href="./dungeon.html">Подземелье ↗</a><a class="brand" href="./"><span class="brand-mark">♜</span><span>CHESS <b>DUNGEONS</b></span></a><a class="source-link" href="./battle.html">Шахматный бой ↗</a><span class="edition">ПРОТОТИП ПРАВИЛ</span><a class="source-link" href="./">Обычные шахматы ↗</a></header>
+  <nav class="lab-tabs" role="tablist" aria-label="Раздел лаборатории"><button id="effects-tab" aria-selected="true" role="tab" aria-controls="effects-panel">Эффекты материалов</button><button id="mechanics-tab" aria-selected="false" role="tab" aria-controls="mechanics-panel" tabindex="-1">Проверка механик</button></nav>
+  <section id="effects-panel" role="tabpanel" aria-labelledby="effects-tab"></section>
+  <section id="fog-panel" role="tabpanel" aria-labelledby="fog-tab" hidden></section>
+  <main id="mechanics-panel" role="tabpanel" class="game-layout lab-layout" aria-labelledby="mechanics-tab" hidden>
+    <section class="arena"><div class="lab-board-label"><span id="lab-turn">Загрузка движка…</span><span>Fairy-Stockfish · WASM</span></div><div id="board" class="board" role="group" aria-label="Доска прототипа"></div><p id="lab-event" class="lab-event" aria-live="polite">Загрузка изменённого Fairy-Stockfish…</p></section>
+    <aside class="sidebar"><div class="chapter">ПРОВЕРКА МЕХАНИК</div><h1>Фигуры с характером.</h1><p class="intro">Прочность и урон участвуют<br>в расчёте каждого продолжения.</p>
+      <section class="game-panel"><label class="mode-label" for="scenario">Сценарий</label><select id="scenario"></select><p id="scenario-description" class="lab-description"></p>
+      <label class="toggle-row" for="lab-auto"><span>Бот играет чёрными</span><input id="lab-auto" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span></label>
+      <label class="toggle-row lab-toggle" for="lab-hunter"><span>Обычный противник<small>Небольшой приоритет стеклянных целей</small></span><input id="lab-hunter" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span></label>
+      <label class="mode-label lab-depth-label" for="lab-depth">Глубина расчёта</label><select id="lab-depth"><option value="3">3 полухода</option><option value="5" selected>5 полуходов</option><option value="7">7 полуходов</option></select>
+      <div class="game-actions lab-actions"><button id="lab-undo" class="secondary-button">↶ Назад</button><button id="lab-bot" class="primary-button">Ход бота ↗</button></div><button id="lab-reset" class="text-button lab-reset">Начать сценарий заново</button>
+      </section>
+      <a class="source-link" href="./materials.html">Все материалы Neo ↗</a><div class="lab-legend"><span>② Каменная · 2 HP</span><span>③ Алмазная · 3 HP</span><span>⚡ Усиленная · 2 урона</span><span>◇ Стеклянная</span></div><p id="lab-search" class="lab-search" aria-live="polite"></p><p class="footnote">Экспериментальная оценка.<br><span>Сила игры и Elo ещё не откалиброваны.</span></p>
+    </aside>
+  </main><script type="module" src="/src/lab/main.js"></script>
+</body></html>

@@ -1,0 +1,7 @@
+.deployment-arena{position:relative}
+.preparation-recon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(var(--deployment-columns)*var(--reserve-tile));height:calc(var(--deployment-rows)*var(--reserve-tile));z-index:8;pointer-events:none}
+.preparation-recon[hidden]{display:none}
+.recon-active .preparation-obscured>:is(img,canvas.piece-shader,.piece-badge,.wild-badge,.coordinate){visibility:hidden}
+.recon-fog .preparation-obscured>:is(img,canvas.piece-shader){display:none}
+.recon-active .square.outside-deployment{filter:none}
+.recon-fallback:after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(var(--deployment-columns)*var(--reserve-tile));height:calc(var(--deployment-rows)*var(--reserve-tile));pointer-events:none;z-index:9;background:linear-gradient(to bottom,#171e22 calc((var(--recon-edge) - var(--recon-fade)*.6)*100%),#29323888 calc(var(--recon-edge)*100%),transparent calc((var(--recon-edge) + var(--recon-fade)*.6)*100%))}

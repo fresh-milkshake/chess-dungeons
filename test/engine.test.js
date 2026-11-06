@@ -27,14 +27,52 @@ test('undo or a new game discards both score and bestmove from an obsolete searc
   assert.deepEqual(scores, [{ type: 'cp', value: 75 }]);
 });
 
-test('scores are always from white perspective and engine replies retain their position', () => {
+test('analysis scores are from white perspective and engine replies retain their position', () => {
   const { engine, scores, moves } = setup();
-  engine.request('position b - - 0 1', true);
+  engine.request('position b - - 0 1');
   engine.receive('info depth 8 score cp 125');
   engine.receive('info depth 9 score mate -3');
+  engine.receive('bestmove e7e5');
+  engine.request('position b - - 0 1', true);
   engine.receive('bestmove e7e5 ponder g1f3');
   assert.deepEqual(scores, [{ type: 'cp', value: -125 }, { type: 'mate', value: 3 }]);
   assert.deepEqual(moves, [['e7e5', 'position b - - 0 1']]);
+});
+
+test('Elo limits the opponent, while subsequent analysis restores full strength', () => {
+  const { engine, commands, scores } = setup();
+  engine.request('position b - - 0 1', true, 1753);
+  assert.ok(commands.includes('setoption name UCI_LimitStrength value true'));
+  assert.ok(commands.includes('setoption name UCI_Elo value 1753'));
+  engine.receive('info depth 8 score cp 125');
+  assert.deepEqual(scores, []);
+  engine.receive('bestmove e7e5');
+  const beforeAnalysis = commands.length;
+  engine.request('next w - - 0 2', false, 1753);
+  assert.deepEqual(commands.slice(beforeAnalysis, beforeAnalysis + 2), [
+    'setoption name UCI_LimitStrength value false',
+    'setoption name Skill Level value 20',
+  ]);
+  engine.receive('info depth 8 score cp 30');
+  assert.deepEqual(scores, [{ type: 'cp', value: 30 }]);
+});
+
+test('changing Elo during a search drops the old move and uses the latest Elo', () => {
+  const { engine, commands, moves } = setup();
+  engine.request('same b - - 0 1', true, 1500);
+  engine.request('same b - - 0 1', true, 2100);
+  engine.receive('bestmove e7e5');
+  assert.deepEqual(moves, []);
+  assert.ok(commands.includes('setoption name UCI_Elo value 2100'));
+  engine.receive('bestmove c7c5');
+  assert.deepEqual(moves, [['c7c5', 'same b - - 0 1']]);
+});
+
+test('beginner difficulty never sends an unsupported Elo value to Stockfish', () => {
+  const { engine, commands } = setup();
+  engine.request('position b - - 0 1', true, 100);
+  assert.ok(commands.includes('setoption name UCI_Elo value 1320'));
+  assert.equal(commands.includes('setoption name UCI_Elo value 100'), false);
 });
 
 test('switching to local play while thinking cannot execute the cancelled engine reply', () => {

@@ -1,0 +1,103 @@
+[
+  {
+    "id": "garden",
+    "title": "Vent, herbes hautes + distant bird phrases",
+    "author": "Joseph SARDIN / LaSonotheque; isaiah658",
+    "license": "CC0-1.0",
+    "source": "https://lasonotheque.org/vent-dans-les-herbes-hautes-s0908.html",
+    "url": "https://lasonotheque.org/UPLOAD/ogg/0908.ogg?v=d",
+    "file": "garden-v2.ogg",
+    "duration": 83.5,
+    "bytes": 749496,
+    "processing": "Continuous wind through tall grass, level trimmed to -25 LUFS; four quiet 2.4-second bird phrases over 83.5 seconds, filtered, -18.4 dB, fades; cyclic 1.5s seam; Vorbis 32kHz stereo. No water layer.",
+    "components": [
+      {
+        "title": "Vent, herbes hautes",
+        "author": "Joseph SARDIN",
+        "source": "https://lasonotheque.org/vent-dans-les-herbes-hautes-s0908.html",
+        "url": "https://lasonotheque.org/UPLOAD/ogg/0908.ogg?v=d",
+        "license": "CC0-1.0"
+      },
+      {
+        "id": "garden",
+        "title": "Ambient Bird Sounds",
+        "author": "isaiah658",
+        "license": "CC0-1.0",
+        "source": "https://opengameart.org/content/ambient-bird-sounds",
+        "url": "https://opengameart.org/sites/default/files/birds-isaiah658_0.ogg"
+      }
+    ]
+  },
+  {
+    "id": "forge",
+    "title": "Dark Ambient Loop 13",
+    "author": "Lucas Calvo / MundoSound",
+    "license": "CC-BY-3.0",
+    "source": "https://opengameart.org/content/dark-ambient-loop-13",
+    "url": "https://opengameart.org/sites/default/files/Dark%20_Atmosphere13_Looped_24bit.wav",
+    "file": "forge.ogg",
+    "duration": 115.073094,
+    "bytes": 631088,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.08s, peak limiter, per-track constant loudness trim."
+  },
+  {
+    "id": "ice",
+    "title": "THOUGHT LOOP",
+    "author": "GloryToTheMachine",
+    "license": "CC-BY-4.0",
+    "source": "https://opengameart.org/content/thought-loop-glorytothemachine-ambientdeepnostalgic-loop",
+    "url": "https://opengameart.org/sites/default/files/thought_loop_-_g2tm.flac",
+    "file": "ice.ogg",
+    "duration": 102.32,
+    "bytes": 1376338,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.08s, peak limiter, per-track constant loudness trim."
+  },
+  {
+    "id": "crypt",
+    "title": "Dark Shrine Loop",
+    "author": "qubodup and yd",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/dark-shrine-loop",
+    "url": "https://opengameart.org/sites/default/files/qubodup-yd-DarkShrineLoop-OpenGameArt.ogg",
+    "file": "crypt.ogg",
+    "duration": 56.492531,
+    "bytes": 676800,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.08s, peak limiter, per-track constant loudness trim."
+  },
+  {
+    "id": "ruins",
+    "title": "Dark Ambient Drone",
+    "author": "Tsorthan Grove",
+    "license": "CC-BY-4.0",
+    "source": "https://opengameart.org/content/dark-ambient-drone",
+    "url": "https://opengameart.org/sites/default/files/dark_ambient_drone_loop.flac",
+    "file": "ruins.ogg",
+    "duration": 119.92,
+    "bytes": 1189167,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.08s, peak limiter, per-track constant loudness trim."
+  },
+  {
+    "id": "court",
+    "title": "Cathedral in the forest (ambient loop)",
+    "author": "congusbongus",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/cathedral-in-the-forest-ambient-loop",
+    "url": "https://opengameart.org/sites/default/files/forest_2_0.ogg",
+    "file": "court.ogg",
+    "duration": 136.894344,
+    "bytes": 1479735,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.08s, peak limiter, per-track constant loudness trim."
+  },
+  {
+    "id": "emperor",
+    "title": "Epic Boss Battle",
+    "author": "Juhani Junkala / SubspaceAudio",
+    "license": "CC0-1.0",
+    "source": "https://opengameart.org/content/boss-battle-music",
+    "url": "https://opengameart.org/sites/default/files/Juhani%20Junkala%20-%20Epic%20Boss%20Battle%20%5BSeamlessly%20Looping%5D.wav",
+    "file": "emperor.ogg",
+    "duration": 123.420594,
+    "bytes": 1811251,
+    "processing": "Resampled to 32kHz stereo Vorbis, cyclic seam crossfade 0.008s, peak limiter, per-track constant loudness trim."
+  }
+]

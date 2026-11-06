@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "node scripts/copy-engine.mjs && vite build",
+    "build:pages": "node scripts/copy-engine.mjs && vite build --mode pages",
+    "build:lab": "node scripts/build-lab.mjs",
+    "test:lab": "node --test engine/verify.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test"
   },

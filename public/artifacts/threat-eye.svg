@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 70">
+ <defs><radialGradient id="iris"><stop stop-color="#ffe0d7"/><stop offset=".35" stop-color="#ff645b"/><stop offset="1" stop-color="#af202b" stop-opacity=".2"/></radialGradient></defs>
+ <path d="M7 35Q50-4 93 35Q50 74 7 35Z" fill="#bd233b" fill-opacity=".13" stroke="#ed4d5b" stroke-width="3"/>
+ <path d="M13 35Q50 6 87 35M23 49Q50 64 77 49" fill="none" stroke="#ff9b93" stroke-opacity=".45" stroke-width="1.5"/>
+ <circle cx="50" cy="35" r="16" fill="url(#iris)" stroke="#ff7778" stroke-opacity=".7"/>
+ <path d="M50 22Q42 35 50 48Q58 35 50 22" fill="#6f1229"/>
+ <circle cx="44" cy="29" r="3" fill="#ffb5a5" fill-opacity=".8"/>
+</svg>

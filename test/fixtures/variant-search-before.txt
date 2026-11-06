@@ -1,0 +1,29 @@
+import {moveParts,rank as squareRank,files,boardAxes} from './coordinates.js';
+/** Iterative alpha-beta for royal-less battles. Native Stockfish requires both kings. */
+export function variantSearch({board,bounds,turn,mode,ep,depth,milliseconds,legal,apply,threatened,wildChoice,required=[]}){
+ const mandatory=new Set(required);
+ const weights={p:100,n:320,b:330,r:510,q:950,k:20000,d:760,j:240},deadline=performance.now()+Math.max(10,Math.min(milliseconds,5000));let nodes=0,doneDepth=0;
+ const evaluate=b=>[...b].reduce((score,[s,p])=>score+(p.color==='w'?1:-1)*((weights[p.type]??0)+(p.hp-1)*Math.min(250,weights[p.type]*.45)+(p.damage-1)*130+(p.type==='k'?0:(3.5-Math.abs(s.charCodeAt(0)-100.5))*3)),0);
+ const next=(b,t)=>t==='w'?([...b.values()].some(p=>p.color==='b')?'b':'x'):t==='b'&&[...b.values()].some(p=>p.color==='wild')?'x':'w';
+ const order=(b,moves)=>[...moves].sort((a,c)=>{const v=m=>{const p=b.get(moveParts(m).from),q=b.get(moveParts(m).to);return q?(weights[q.type]??0)*(q.hp<=p.damage?10:2)-(weights[p.type]??0):0;};return v(c)-v(a);});
+ function search(b,t,passant,d,alpha,beta){
+  if((++nodes&31)===0&&performance.now()>deadline)throw Error('budget');
+  if(![...b.values()].some(p=>p.type==='k'&&p.color==='w'))return -1e6-d;
+  if(mode==='clear'&&![...b.values()].some(p=>p.color==='b'||p.color==='wild'&&(!p.neutral||mandatory.has(p.wildId))))return 1e6+d;
+  if(mode==='solo'&&![...b.values()].some(p=>p.color==='wild'))return 1e6+d;
+  if(mode==='mixed'&&![...b.values()].some(p=>p.type==='k'&&p.color==='b'))return 1e6+d;
+  if(!d)return evaluate(b);
+  const color=t==='x'?'wild':t,moves=legal(b,bounds,color,passant);
+  if(!moves.length){if(color==='w'&&threatened(b,bounds,'w'))return -1e6-d;if(color==='b'&&mode!=='clear'&&threatened(b,bounds,'b'))return 1e6+d;return search(b,next(b,t),'-',d-1,alpha,beta);}
+  if(t==='x'){const m=wildChoice(b,bounds,moves,passant),n=apply(b,m,passant,t==='x'?'wild':t);return search(n.board,next(n.board,t),'-',d-1,alpha,beta);}
+  let best=t==='w'?-Infinity:Infinity;
+  for(const m of order(b,moves)){const n=apply(b,m,passant),p=b.get(moveParts(m).from),newEp=p?.type==='p'&&!n.hit&&Math.abs(squareRank(moveParts(m).from)-squareRank(moveParts(m).to))===2?moveParts(m).from[0]+((squareRank(moveParts(m).from)+squareRank(moveParts(m).to))/2):'-';const v=search(n.board,next(n.board,t),newEp,d-1,alpha,beta);if(t==='w'){best=Math.max(best,v);alpha=Math.max(alpha,best);}else{best=Math.min(best,v);beta=Math.min(beta,best);}if(beta<=alpha)break;}
+  return best;
+ }
+ const moves=order(board,legal(board,bounds,turn,ep));let bestmove=moves[0];
+ for(let d=1;d<=Math.min(depth,12);d++){
+  let best=turn==='w'?-Infinity:Infinity,candidate=bestmove;
+  try{for(const m of moves){const n=apply(board,m,ep,turn),v=search(n.board,next(n.board,turn),'-',d-1,-Infinity,Infinity);if(turn==='w'?v>best:v<best){best=v;candidate=m;}if(performance.now()>deadline)throw Error('budget');}bestmove=candidate;doneDepth=d;}catch{break;}
+ }
+ return {bestmove,depth:doneDepth,nodes,searchBackend:'variant'};
+}

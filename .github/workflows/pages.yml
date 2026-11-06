@@ -1,7 +1,5 @@
 name: Deploy GitHub Pages
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -23,8 +21,26 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Build Fairy-Stockfish
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y emscripten
+          npm run build:lab
       - run: npm test
-      - run: npm run build
+      - run: npm run test:lab
+      - run: npm run build:pages
+      - name: Check deployment contents
+        run: |
+          test -f dist/index.html
+          test -f dist/dungeon.html
+          test -f dist/deployment.html
+          test -f dist/battle.html
+          test ! -e dist/lab.html
+          test ! -e dist/materials.html
+          if grep -lE 'href="[^"]*(lab|materials)\.html' dist/*.html dist/assets/*.js; then
+            exit 1
+          fi
+          cp LICENSE dist/licenses/chess-dungeons-GPL-3.0.txt
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

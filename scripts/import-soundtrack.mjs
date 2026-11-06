@@ -1,0 +1,11 @@
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+const tracks=[
+{id:'garden',title:'Ambient Bird Sounds',author:'isaiah658',license:'CC0-1.0',source:'https://opengameart.org/content/ambient-bird-sounds',url:'https://opengameart.org/sites/default/files/birds-isaiah658_0.ogg'},
+{id:'forge',title:'Dark Ambient Loop 13',author:'Lucas Calvo / MundoSound',license:'CC-BY-3.0',source:'https://opengameart.org/content/dark-ambient-loop-13',url:'https://opengameart.org/sites/default/files/Dark%20_Atmosphere13_Looped_24bit.wav'},
+{id:'ice',title:'THOUGHT LOOP',author:'GloryToTheMachine',license:'CC-BY-4.0',source:'https://opengameart.org/content/thought-loop-glorytothemachine-ambientdeepnostalgic-loop',url:'https://opengameart.org/sites/default/files/thought_loop_-_g2tm.flac'},
+{id:'crypt',title:'Dark Shrine Loop',author:'qubodup and yd',license:'CC0-1.0',source:'https://opengameart.org/content/dark-shrine-loop',url:'https://opengameart.org/sites/default/files/qubodup-yd-DarkShrineLoop-OpenGameArt.ogg'},
+{id:'ruins',title:'Dark Ambient Drone',author:'Tsorthan Grove',license:'CC-BY-4.0',source:'https://opengameart.org/content/dark-ambient-drone',url:'https://opengameart.org/sites/default/files/dark_ambient_drone_loop.flac'},
+{id:'court',title:'Cathedral in the forest (ambient loop)',author:'congusbongus',license:'CC0-1.0',source:'https://opengameart.org/content/cathedral-in-the-forest-ambient-loop',url:'https://opengameart.org/sites/default/files/forest_2_0.ogg'},
+{id:'emperor',title:'Epic Boss Battle',author:'Juhani Junkala / SubspaceAudio',license:'CC0-1.0',source:'https://opengameart.org/content/boss-battle-music',url:'https://opengameart.org/sites/default/files/Juhani%20Junkala%20-%20Epic%20Boss%20Battle%20%5BSeamlessly%20Looping%5D.wav'}];
+await mkdir('outputs/audio-import',{recursive:true});await writeFile('outputs/audio-import/sources.json',JSON.stringify(tracks,null,2));
+let i=0;await Promise.all([0,1].map(async()=>{while(i<tracks.length){const t=tracks[i++],file=`outputs/audio-import/${t.id}.${t.url.split('.').at(-1)}`;try{await readFile(file);console.log(t.id,'cached');continue;}catch{}const r=await fetch(t.url);if(!r.ok)throw Error(t.id+': '+r.status);await writeFile(file,new Uint8Array(await r.arrayBuffer()));console.log(t.id,'downloaded');}}));

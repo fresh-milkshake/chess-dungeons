@@ -9,9 +9,9 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <header class="header">
+    <header class="header"><a class="source-link" href="./dungeon.html">Подземелье ↗</a>
       <a class="brand" href="./" aria-label="Chess Dungeons — главная"><span class="brand-mark">♜</span><span>CHESS <b>DUNGEONS</b></span></a>
-      <span class="edition"><span></span> КЛАССИЧЕСКИЕ ШАХМАТЫ</span>
+      <a class="source-link" href="./battle.html">Шахматный бой ↗</a><span class="edition"><span></span> КЛАССИЧЕСКИЕ ШАХМАТЫ</span>
       <a class="source-link" href="https://github.com/fresh-milkshake/chess-dungeons" target="_blank" rel="noreferrer">GitHub ↗</a>
     </header>
     <main class="game-layout">
@@ -33,12 +33,22 @@
           <h2 id="status" aria-live="polite">Ход белых</h2>
           <label class="mode-label" for="mode">Соперник</label>
           <select id="mode"><option value="local">Друг за одной доской</option><option value="engine">Stockfish · вы за белых</option></select>
+          <div id="engine-strength" class="engine-strength" hidden>
+            <div class="elo-heading"><label for="elo">Сила соперника</label><div class="elo-value"><input id="elo" type="number" step="1" value="1600" inputmode="numeric" aria-describedby="elo-note" /><span>Elo</span></div></div>
+            <input id="elo-range" type="range" step="1" value="1600" aria-label="Сила Stockfish в Elo" aria-describedby="elo-note" />
+            <div class="elo-limits"><span>100</span><span>3190</span></div>
+            <small id="elo-note">Целевая сила движка, приблизительный рейтинг.</small>
+          </div>
           <div class="moves-heading"><span>ХОДЫ</span><span id="move-count">0</span></div>
           <div class="move-list" id="move-list" aria-label="История ходов"><div class="empty-moves">История начинается с первого хода.</div></div>
           <div class="game-actions"><button id="undo" class="secondary-button" disabled>↶ &nbsp; Назад</button><button id="new-game" class="primary-button">Новая партия <span>↗</span></button></div>
         </section>
-        <section class="settings" aria-label="Настройки"><label class="toggle-row" for="show-eval"><span>Шкала преимущества<small id="engine-status" aria-live="polite">Stockfish · загрузка…</small></span><input id="show-eval" type="checkbox" role="switch" checked /><span class="switch-track" aria-hidden="true"></span></label></section>
-        <p class="footnote">Сначала — шахматы.<br><span>Подземелья появятся чуть позже.</span></p>
+        <section class="settings" aria-label="Настройки">
+          <label class="toggle-row" for="show-eval"><span>Шкала преимущества<small id="engine-status" aria-live="polite">Stockfish · загрузка…</small></span><input id="show-eval" type="checkbox" role="switch" checked /><span class="switch-track" aria-hidden="true"></span></label>
+          <label class="toggle-row sound-setting" for="sound-enabled"><span>Звуки ходов</span><input id="sound-enabled" type="checkbox" role="switch" checked /><span class="switch-track" aria-hidden="true"></span></label>
+          <fieldset class="piece-set-field"><legend>Набор фигур</legend><div id="piece-sets" class="piece-sets"></div></fieldset>
+        </section>
+        <p class="footnote">Сначала — шахматы.</p>
       </aside>
     </main>
     <dialog id="promotion"><h2>Превращение пешки</h2><p>Выберите новую фигуру</p><div class="promotion-options"></div></dialog>
