@@ -12,13 +12,41 @@ export function keyboardDirection(codes) {
 }
 
 /** Shared focus/navigation for exploration and every map dialog. */
-export function setupMapKeyboard({ viewport, dialogs, getStage, isBusy, isBlocked, step, selectKing, center, canRestart=()=>false, restart, changeVariation, scope=createScope() }) {
+export function setupMapKeyboard({ viewport, dialogs, directionControls, getStage, isBusy, isBlocked, step, selectKing, center, canRestart=()=>false, restart, changeVariation, scope=createScope() }) {
   const held = new Set();
-  let timer, previousStage, focusIndex = 0;
+  let timer, previousStage, pointer, focusIndex = 0;
   const buffer=createStepBuffer({step,isBusy,canMove:()=>scope.active&&!isBlocked()&&dialogs.hidden&&!document.hidden&&(getStage()==='exploring'||isShopping(getStage()))});
   const controls = () => [...dialogs.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled)')]
     .filter(element => element.getClientRects().length && !element.closest('[hidden]'));
-  const stop = () => { clearTimeout(timer); timer = null; held.clear();buffer.reset(); };
+  const release = () => {
+    if (!pointer) return;
+    const {button,id}=pointer;pointer=null;
+    buffer.setHeld(null);
+    if(button.hasPointerCapture(id))button.releasePointerCapture(id);
+  };
+  const stop = () => { clearTimeout(timer); timer = null; held.clear();release();buffer.reset(); };
+  if(directionControls){
+    const buttonAt=event=>event.target.closest('button[data-dx]');
+    const directionFor=button=>[Number(button.dataset.dx),Number(button.dataset.dy)];
+    scope.on(directionControls,'pointerdown',event=>{
+      const button=buttonAt(event);
+      if(!button||button.disabled||button.getAttribute('aria-disabled')==='true'||pointer||!event.isPrimary||event.button!==0||isBlocked())return;
+      event.preventDefault();
+      stop();
+      pointer={button,id:event.pointerId};
+      button.setPointerCapture(event.pointerId);
+      const direction=directionFor(button);
+      buffer.setHeld(direction);
+      buffer.press(direction);
+    });
+    for(const type of ['pointerup','pointercancel','lostpointercapture']){
+      scope.on(directionControls,type,event=>{if(pointer?.id===event.pointerId)release();});
+    }
+    scope.on(directionControls,'click',event=>{
+      const button=buttonAt(event);
+      if(event.detail===0&&button&&!button.disabled&&button.getAttribute('aria-disabled')!=='true')buffer.press(directionFor(button));
+    });
+  }
   function move() {
     clearTimeout(timer); timer = null;
     if (isBlocked() || !(getStage()==='exploring'||isShopping(getStage()))) return;
@@ -82,6 +110,7 @@ export function setupMapKeyboard({ viewport, dialogs, getStage, isBusy, isBlocke
     if (!direction && !confirm && !wait) return;
     event.preventDefault();
     if (event.repeat) return;
+    if(pointer)stop();
     if (confirm) { stop(); selectKing(); return; }
     if (wait) { stop(); buffer.press([0, 0]); return; }
     held.add(code);

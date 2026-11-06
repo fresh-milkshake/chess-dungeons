@@ -11,6 +11,8 @@ import {loadRun} from '../dungeon/storage.js';
 import {createScope} from './scope.js';
 import {routeFor,campaignRoute} from './routes.js';
 import {sharedEngine} from './engine.js';
+import '../mobile.css';
+import './mobile.css';
 
 const templates={map:mapDocument,deployment:deploymentDocument,battle:battleDocument};
 const host=document.createElement('div');host.id='app-screen-host';document.body.replaceChildren(host);mountSoundControls();

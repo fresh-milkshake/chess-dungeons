@@ -111,7 +111,7 @@ function render(){
  const slots=$('deployment-slots'),limit=deploymentLimit(run),free=Math.max(0,limit-Object.keys(positions).length);
  if(slots.childElementCount!==free){slots.replaceChildren(...Array.from({length:free},()=>{const square=document.createElement('span');square.setAttribute('aria-hidden','true');return square;}));}
  slots.setAttribute('aria-label',`Свободных мест: ${free} из ${limit}`);slots.title=`Свободных мест: ${free} из ${limit}`;
- $('return-piece').disabled=busy||!positions[selected];$('clear-formation').disabled=busy;$('auto-formation').disabled=busy;
+ $('return-piece').disabled=$('touch-return-piece').disabled=busy||!positions[selected];$('clear-formation').disabled=busy;$('auto-formation').disabled=busy;
  $('leave-preparation').textContent=enemy.boss?'Вернуться к подготовке позже':'Отступить';
  let problem='';try{const valid=deploymentPreset(run,enemy,positions);warmPosition(valid);}catch(error){problem=error.message;prepared=null;}
  $('begin-battle').disabled=busy||!!problem||!!prepared?.error;
@@ -136,7 +136,7 @@ try{
   $('auto-glass').checked=!!run.deploymentOptions?.glass;$('auto-ethereal').checked=!!run.deploymentOptions?.ethereal;
   $('previous-formation').disabled=!run.previousDeployment;
   render();
-  suppressClick=enableBoardDrag({scope,board:$('preparation'),
+  suppressClick=enableBoardDrag({scope,board:$('preparation'),touchScroll:$('reserve'),
    canDrag:token=>{if(busy||playing)return null;const id=token.startsWith('reserve:')?token.slice(8):Object.keys(run.deployment.positions).find(id=>run.deployment.positions[id]===token);return pieceFor(id);},
    select:token=>{selected=token.startsWith('reserve:')?token.slice(8):Object.keys(run.deployment.positions).find(id=>run.deployment.positions[id]===token);render();},
    drop:place,canDrop,imageFor,
@@ -163,6 +163,7 @@ $('preparation').addEventListener('click',event=>{
  if(selected===occupant){selected=null;render();}else if(selected)place(square);else if(occupant){selected=occupant;render();}
 });
 $('return-piece').addEventListener('click',()=>place('reserve'));
+$('touch-return-piece').addEventListener('click',()=>$('return-piece').click());
 $('clear-formation').addEventListener('click',()=>{try{commit(initialDeployment(run,enemy).positions);selected=null;render();}catch(error){status(error.message,true);}});
 $('auto-formation').addEventListener('click',()=>{if(busy||playing||!enemy)return;try{commit(automaticDeployment(run,enemy,run.deploymentOptions));selected=null;render();}catch(error){status(error.message,true);}});
 $('previous-formation').addEventListener('click',()=>{if(busy||playing||!enemy)return;try{commit(previousDeployment(run,enemy));selected=null;render();}catch(error){status(error.message,true);}});

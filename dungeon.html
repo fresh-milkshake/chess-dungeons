@@ -1,6 +1,22 @@
 <!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chess Dungeons · Подземелье</title><link rel="icon" href="./favicon.svg"></head><body class="dungeon-page">
 <main id="map-viewport" class="map-viewport" tabindex="0" aria-label="Подземелье. WASD или стрелки — ход короля, сочетания — диагонали. Пробел — ждать. Enter — выбрать короля. Перетаскивание карты — камера"><div id="map" class="dungeon-map" role="group" aria-label="Карта подземелья"></div></main>
 <aside class="squad-dock" aria-label="Ваш отряд"><div id="inventory" class="inventory"></div><p id="buff-summary"></p></aside>
+<section class="map-touch-controls" aria-label="Управление подземельем" hidden>
+ <div class="map-touch-tools">
+  <p id="touch-map-status" role="status"></p>
+  <div class="map-touch-camera" aria-label="Камера">
+   <button type="button" id="touch-zoom-out" aria-label="Уменьшить карту">−</button>
+   <button type="button" id="touch-center" aria-label="Камера к королю">⌖</button>
+   <button type="button" id="touch-zoom-in" aria-label="Увеличить карту">+</button>
+  </div>
+  <button type="button" id="touch-new-run" class="text-button">Новый забег</button>
+ </div>
+ <div class="dpad" role="group" aria-label="Ход короля">
+  <button type="button" data-dx="-1" data-dy="-1" aria-label="Вверх-влево">↖</button><button type="button" data-dx="0" data-dy="-1" aria-label="Вверх">↑</button><button type="button" data-dx="1" data-dy="-1" aria-label="Вверх-вправо">↗</button>
+  <button type="button" data-dx="-1" data-dy="0" aria-label="Влево">←</button><button type="button" data-dx="0" data-dy="0" aria-label="Ждать">◷</button><button type="button" data-dx="1" data-dy="0" aria-label="Вправо">→</button>
+  <button type="button" data-dx="-1" data-dy="1" aria-label="Вниз-влево">↙</button><button type="button" data-dx="0" data-dy="1" aria-label="Вниз">↓</button><button type="button" data-dx="1" data-dy="1" aria-label="Вниз-вправо">↘</button>
+ </div>
+</section>
 <aside id="shop-controls" class="shop-controls" hidden><div class="chapter">МЕЖДУ АКТАМИ · МАГАЗИН</div><p id="shop-wallet"></p><p id="shop-description" aria-live="polite"></p><button id="shop-buy" class="primary-button" hidden>Купить · Enter</button><small>WASD / стрелки — идти · Enter / пробел — купить · выход справа</small></aside>
 <div id="map-dialogs" class="map-dialogs" hidden>
 <section id="reward-panel" class="dungeon-panel" role="dialog" aria-modal="true" aria-label="Выбор награды" hidden><div class="chapter">НАХОДКА</div><h2>Среди осколков</h2><p>WASD / стрелки — выбрать награду. Enter — получить.</p><div id="reward-options" class="reward-options"></div></section>

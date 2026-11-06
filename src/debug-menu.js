@@ -2,9 +2,11 @@ import {createScope} from './app/scope.js';
 import './debug-menu.css';
 
 export function setupDebugMenu({root=document,scope=createScope()}={}){
- const panel=root.querySelector('#'+'debug-panel'),toggle=root.querySelector('#'+'debug-toggle');
+ const panel=root.querySelector('.debug-panel'),toggle=root.querySelector('#debug-toggle');
+ const triggers=root.querySelectorAll(`[aria-controls="${panel.id}"]`);
  function setOpen(open){
-  panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+  panel.hidden=!open;
+  for(const button of triggers)button.setAttribute('aria-expanded',String(open));
   document.dispatchEvent(new CustomEvent('debug-menu-change',{detail:{open}}));
   if(open)root.querySelector('#'+'debug-close').focus();
   else if(panel.contains(document.activeElement))document.activeElement.blur();
@@ -17,5 +19,5 @@ export function setupDebugMenu({root=document,scope=createScope()}={}){
   if(event.code==='Escape'&&!panel.hidden){event.preventDefault();setOpen(false);}
  },{capture:true});
  scope.onPause(()=>setOpen(false));
- return {get isOpen(){return !panel.hidden;}};
+ return {setOpen,get isOpen(){return !panel.hidden;}};
 }

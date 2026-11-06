@@ -1,0 +1,108 @@
+.map-touch-controls,.battle-touch-controls,#touch-return-piece{display:none}
+
+@media(max-width:760px){
+  #promotion-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  #promotion-options button{min-height:44px;padding:4px}
+  #promotion-options :is(img,canvas.piece-shader){width:100%;height:auto;aspect-ratio:1}
+  .run-difficulty{max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
+}
+
+@media(max-width:640px), (pointer:coarse){
+  .debug-panel{overscroll-behavior:contain}
+  .map-touch-controls:not([hidden]){
+    position:fixed;z-index:35;inset:auto max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+    display:flex;justify-content:space-between;align-items:end;gap:10px;pointer-events:none;
+  }
+  .map-touch-tools{display:grid;gap:3px;min-width:0;color:#dfcda8}
+  .map-touch-tools button,.map-touch-controls .dpad button{pointer-events:auto;min-height:44px;touch-action:manipulation}
+  .map-touch-tools .text-button{justify-self:start;padding-inline:8px;background:#211f1bde;border:1px solid #6a5a3b;border-radius:5px}
+  #touch-map-status{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:11px;line-height:1.45;margin:0 0 4px;max-width:240px;text-shadow:0 1px 3px #000,0 0 6px #000}
+  .map-touch-camera{display:flex;gap:4px}
+  .map-touch-camera[hidden]{display:none}
+  .map-touch-camera button,.map-touch-controls .dpad button{width:44px;border:1px solid #7c6947;border-radius:6px;background:#29251fef;color:#ead5ac;font-size:20px}
+  .map-touch-controls .dpad{grid-template-columns:repeat(3,44px);gap:4px}
+  .map-touch-controls .dpad button{touch-action:none}
+  .map-touch-controls button:active{background:#51432d}
+  .map-touch-controls button[aria-disabled=true]{opacity:.35}
+  .dungeon-page .app-screen:has(.map-touch-controls:not([hidden])) .squad-dock{bottom:calc(158px + env(safe-area-inset-bottom));width:max-content}
+  .dungeon-page .inventory{--squad-size:34px!important}
+  .dungeon-page .timing-dock,.battle-page .timing-dock,.deployment-page .timing-dock{top:60px;bottom:auto;left:8px;transform:none}
+  .dungeon-page .timing-panel,.battle-page .timing-panel,.deployment-page .timing-panel{top:100px;bottom:auto;max-height:calc(100dvh - 112px)}
+  .dungeon-page.shopping .shop-controls{top:100px}
+  .shopping .shop-controls small{display:none}
+  .shopping .shop-controls #shop-buy{min-height:44px}
+  .dungeon-page.shopping .dungeon-map{--camera-tile:max(14px,min(calc((100vw - 44px)/var(--shop-columns,15)),calc((100dvh - 290px)/var(--shop-rows,7)),90px))!important}
+  .map-dialogs :is(.primary-button,.secondary-button){min-height:44px}
+
+  .deployment-page .preparation{touch-action:auto}
+  .deployment-page :is(.reserve-pieces,.reserve-piece){touch-action:none}
+  .deployment-heading h1{display:block}
+  .deployment-toolbar kbd{display:none}
+  .deployment-tools #touch-return-piece{display:block}
+  .deployment-toolbar :is(.text-button,.formation-reset,.primary-button){min-height:44px}
+  .deployment-tools{justify-content:flex-end}
+  .deployment-tools .text-button{white-space:normal}
+  .deployment-page .debug-toggle{top:8px;right:58px;min-height:44px}
+  .deployment-page .deployment-arena .board{width:calc(var(--deployment-columns)*var(--reserve-tile))}
+
+  .battle-page .battle-stage,.battle-page .app-screen:has(.artifact-bar:not([hidden])) .battle-stage{padding:96px 8px calc(94px + env(safe-area-inset-bottom))}
+  .battle-page .battle-stage .battle-arena,.battle-page .app-screen:has(.artifact-bar:not([hidden])) .battle-stage .battle-arena{
+    --battle-height:calc(100dvh - 190px - env(safe-area-inset-bottom));
+    width:min(calc(100vw - 16px),calc(var(--battle-height)*var(--board-ratio)));
+    height:min(var(--battle-height),calc((100vw - 16px)/var(--board-ratio)));
+  }
+  .battle-touch-controls{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;position:fixed;z-index:50;
+    bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(360px,calc(100vw - 24px));
+  }
+  .battle-touch-controls p{grid-column:1/-1;text-align:center;color:#e2cfaa;font-size:12px;margin:0}
+  .battle-touch-controls button{min-height:44px;background:#29251f;border-color:#6c5b3d}
+  .battle-page .debug-toggle{display:none}
+  .battle-page .debug-panel{top:62px;bottom:calc(76px + env(safe-area-inset-bottom))}
+  .battle-result{padding:12px;overflow:auto}
+  .battle-result h2,.battle-result .result-reward{margin:8px 0}
+  .battle-result .primary-button{min-height:44px;margin-top:8px}
+}
+
+@media(max-width:640px){
+  .deployment-page .preparation{grid-template-rows:52px minmax(0,1fr) auto 98px;gap:9px}
+  .deployment-page .deployment-heading{justify-self:start;text-align:left;max-width:calc(100% - 130px)}
+  .deployment-heading h1{font-size:clamp(19px,6vw,29px)}
+  .deployment-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:44px 44px;gap:6px}
+  .deployment-tools,.formation-shortcuts{gap:7px}
+  .deployment-ready{grid-template-columns:40px auto 44px}
+  .deployment-slots{width:40px}
+  .deployment-ready .primary-button{min-width:0}
+  .deployment-page .timing-dock{top:72px}
+}
+
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+  .map-touch-controls{left:auto}
+  .dungeon-page .app-screen:has(.map-touch-controls:not([hidden])) .squad-dock{bottom:12px;max-width:45vw}
+  .battle-page .battle-stage,.battle-page .app-screen:has(.artifact-bar:not([hidden])) .battle-stage{padding:34px 155px 8px 8px}
+  .battle-page .battle-stage .battle-arena,.battle-page .app-screen:has(.artifact-bar:not([hidden])) .battle-stage .battle-arena{
+    --battle-height:calc(100dvh - 44px);
+    width:min(calc(100vw - 165px),calc(var(--battle-height)*var(--board-ratio)));
+    height:min(var(--battle-height),calc((100vw - 165px)/var(--board-ratio)));
+  }
+  .battle-touch-controls{left:auto;right:12px;transform:none;width:138px;grid-template-columns:1fr}
+  .battle-page .timing-dock,.deployment-page .timing-dock{top:5px}
+  .battle-page .artifact-bar{top:56px;right:12px;left:auto;width:138px}
+  .deployment-page .timing-dock{left:auto;right:154px}
+  .deployment-page .artifact-bar{max-width:calc(100vw - 320px)}
+  .deployment-page .preparation,.deployment-page .app-screen:has(.artifact-bar:not([hidden])) .preparation{
+    grid-template-columns:minmax(0,1fr) minmax(180px,36%);grid-template-rows:44px minmax(0,1fr) auto;
+    padding:56px 10px 8px;gap:6px 12px;
+    --reserve-tile:min(calc((100dvh - 68px)/var(--deployment-rows)),calc((100vw - 245px)/var(--deployment-columns)),76px);
+  }
+  .deployment-arena{grid-row:1/-1}
+  .deployment-heading,.deployment-tray,.deployment-toolbar{grid-column:2}
+  .deployment-page .deployment-heading{grid-row:1;max-width:100%}
+  .deployment-heading h1{font-size:26px}
+  .deployment-tray{grid-row:2;align-self:center}
+  .deployment-toolbar{grid-row:3;grid-template-columns:1fr;gap:2px}
+  .deployment-ready,.formation-shortcuts,.deployment-tools{grid-column:1;grid-row:auto;justify-self:center}
+  .deployment-ready{grid-template-columns:38px auto 44px}
+  .deployment-slots{width:38px}
+  .deployment-ready .primary-button{min-width:0}
+}

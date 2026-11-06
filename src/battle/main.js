@@ -36,7 +36,7 @@ const $ = id=>root.querySelector('#'+id);
 const storageKey='chess-dungeons-battle-v1';
 function setSearchDepth(value){const n=Math.max(1,Math.min(12,Number(value)||5));if(![...$('depth').options].some(o=>o.value===String(n)))$('depth').add(new Option(String(n),String(n)));$('depth').value=String(n);}
 function restoreAiSettings(settings){if(!settings)return;if([...$('ai-budget').options].some(o=>o.value===settings.budget))$('ai-budget').value=settings.budget;if(settings.depth)setSearchDepth(settings.depth);}
-setupDebugMenu({root,scope});
+const debugMenu=setupDebugMenu({root,scope});
 const engine=existingEngine??new DungeonEngine(), battle=new Battle(engine);
 const animation=createMoveAnimation($('board'));
 const sound=createMoveSound(()=>$('sound').checked);
@@ -74,6 +74,7 @@ function render(){
   const result=battle.result, {turn}=parsePosition(battle.state.fen);
   if(timingContext)trackStage({...timingContext,phase:result?(result.result==='win'&&campaign?.run.enemies.find(e=>e.id===campaign.preset.enemyId)?.boss?'boss-reward':'results'):turn==='w'?'battle-player':'battle-bot'});
   $('turn').textContent=result?result.title:busy?(turn==='x'?'Дикая фигура выбирает жертву…':'Противник рассчитывает ход…'):`${battle.state.check?'Шах · ':''}${turn==='w'?'Ваш ход · белые':turn==='x'?'Ход дикой фигуры':'Ход противника'}`;
+  if($('touch-battle-turn').textContent!==$('turn').textContent)$('touch-battle-turn').textContent=$('turn').textContent;
   $('result').hidden=!result||editor.editing;
   if(result){
    $('result-title').textContent=result.title;$('result-detail').textContent=result.detail;$('result').dataset.result=result.result;
@@ -92,6 +93,7 @@ function render(){
   for(const id of ['new','battle-preset','depth','ai-budget','again','flip','redeploy'])$(id).disabled=busy;
   if(campaign){$('new').hidden=true;$('battle-preset').disabled=true;}
   $('undo').disabled=busy || !battle.history.length;
+  $('touch-battle-undo').disabled=$('undo').disabled||!!result;
   $('resign').disabled=busy || !!result;
 }
 function guarded(action){if(!scope.active||busy)return pendingAction;const job=performAction(action);pendingAction=job;return job;}
@@ -164,6 +166,7 @@ const suppressClick=enableBoardDrag({scope,
   onCancel:()=>{selected=null;render();},
 });
 $('board').addEventListener('pointerdown',sound.unlock,{capture:true});
+$('board').addEventListener('pointerup',event=>{if(event.pointerType==='touch')sound.unlock();},{capture:true});
 $('board').addEventListener('click',event=>{
   if(suppressClick())return;
   if(editor.consumeClick(event.target))return;
@@ -190,6 +193,8 @@ $('undo').addEventListener('click',()=>guarded(async()=>{
  await battle.undoTurn(async move=>{const before=animation.snapshot();render();await animation.undo(move,before);});
  $('event').textContent='Ваш ход и ответ противника отменены.';$('search').textContent='';
 }));
+$('touch-battle-undo').addEventListener('click',()=>$('undo').click());
+$('touch-battle-menu').addEventListener('click',()=>debugMenu.setOpen(!debugMenu.isOpen));
 $('resign').addEventListener('click',()=>guarded(async()=>{battle.resigned=true;$('event').textContent='Бой завершён.';}));
 $('flip').addEventListener('click',()=>{if(busy)return;flipped=!flipped;selected=null;render();save();});
 $('sound').addEventListener('change',()=>{sound.unlock();save();});

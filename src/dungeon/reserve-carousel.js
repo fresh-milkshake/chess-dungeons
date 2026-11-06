@@ -5,7 +5,7 @@ export function setupReserveCarousel({container,board,scope}){
   frame=0;if(!scope.active)return;
   const nodes=[...container.querySelectorAll(':scope > [data-piece-id]')],width=container.clientWidth;
   const first=nodes[0],last=nodes.at(-1),natural=first?last.offsetLeft+last.offsetWidth-first.offsetLeft:0;
-  const boardWidth=board.getBoundingClientRect().width,wasOverflow=container.classList.contains('reserve-overflow');
+  const boardWidth=Math.min(width,board.getBoundingClientRect().width),wasOverflow=container.classList.contains('reserve-overflow');
   const overflow=natural>boardWidth+1;container.classList.toggle('reserve-overflow',overflow);
   // The viewport stays screen-wide. Gutters let even the first/last sprite
   // reach the centre instead of remaining permanently hidden in an edge fade.

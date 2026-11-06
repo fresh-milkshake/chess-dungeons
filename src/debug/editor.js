@@ -6,7 +6,7 @@ const roles={p:'Пешка',n:'Конь',b:'Слон',r:'Ладья',q:'Ферз
 const materials={ordinary:'Обычная',stone:'Камень · 2 HP',glass:'Стекло',ethereal:'Эфир',diamond:'Алмаз · 3 HP',power:'Усиление · 2 урона'};
 
 export function setupPieceEditor({onApply,onPick=()=>false,isBusy=()=>false,resolveTarget,helpText,container=document,scope=createScope()}){
- const panel=container.querySelector('#debug-panel'),root=document.createElement('section');root.className='debug-editor';
+ const panel=container.querySelector('.debug-panel'),root=document.createElement('section');root.className='debug-editor';
  root.innerHTML='<h3>Фигуры и материалы</h3><label class="editor-mode"><input id="debug-edit-mode" type="checkbox">Редактор · ИИ на паузе</label><select id="debug-piece-color" aria-label="Сторона добавляемой фигуры"><option value="w">Белые · игрок</option><option value="b">Чёрные · противник</option><option value="wild">Дикие · третья сторона</option></select><div class="editor-pieces"></div><div class="editor-materials"></div><p>В редакторе перетаскивайте любые фигуры свободно; за пределы доски — удалить. Занятые клетки меняются местами. Материалы работают на всех сторонах. Король всегда обычный. Правки начинают историю заново.</p><p class="editor-status" role="status"></p>';
  panel.append(root);
  if(helpText)root.querySelector('p').textContent=helpText;

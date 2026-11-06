@@ -56,6 +56,9 @@ const fog=setupMapFog($('map-viewport'),$('map'),{scope});
 const exitMirage=createExitMirage($('map-viewport'),scope);
 let cameraPlayer=null;
 let keyboard;
+const touchControls=root.querySelector('.map-touch-controls');
+const touchDirections=touchControls.querySelector('.dpad');
+const directionButtons=root.querySelectorAll('.debug-panel .dpad button');
 const artifactBar=createArtifactBar({root,scope,onUse:id=>{const a=artifactById(id);if(id==='merchant-die'){apply(()=>rerollShop(run),{animate:false});}else if(a.kind==='toggle'){run.artifactToggles??={};run.artifactToggles[id]=run.artifactToggles[id]===false;persist();render();}else{run.message=a.description;render();}}});
 const cellViews=new WeakMap();
 const merchantUI=createMerchantUI({root,scope,getRun:()=>run,onAction:action=>apply(()=>action(run),{animate:false})});
@@ -63,6 +66,7 @@ let inventoryView='';
 const sound=createMoveSound(()=>$('sound-toggle').checked);
 try{$('sound-toggle').checked=localStorage.getItem('chess-dungeons-map-sound')!=='off';}catch{/* Optional preference. */}
 scope.on(document,'pointerdown',()=>sound.unlock());
+scope.on(document,'pointerup',event=>{if(event.pointerType==='touch')sound.unlock();});
 scope.on(document,'keydown',()=>sound.unlock());
 $('sound-toggle').addEventListener('change',()=>{if(!$('sound-toggle').checked)sound.stop();try{localStorage.setItem('chess-dungeons-map-sound',$('sound-toggle').checked?'on':'off');}catch{/* Optional preference. */}});
 try{run=loadRun();if(!run){run=new Run();needsDifficulty=true;}}catch{run=new Run();needsDifficulty=true;run.message='Сохранение не удалось восстановить. Начат новый забег.';}
@@ -212,8 +216,18 @@ function renderContent(){
  if(run.stage==='victory'){$('ending-label').textContent='ПОБЕДА';$('ending-title').textContent='Подземелье пройдено.';}
  $('next-floor').hidden=run.stage!=='cleared'||run.floor>=floorsInAct(run.act);
  const hunter=run.enemies.find(e=>e.roaming&&!e.wild&&!e.weak),visible=hunter&&run.visible.includes(key(hunter.x,hunter.y));$('hunter-status').textContent=visible?'Преследователь в поле зрения.':hunter?'Вы слышите далёкие шаги.':'';
- for(const b of document.querySelectorAll('.dpad button'))b.disabled=busy||run.stage!=='exploring';
- for(const id of ['fight','retreat','next-floor','new-run'])$(id).disabled=busy;
+ const shopping=isShopping(run.stage);
+ touchControls.hidden=run.stage!=='exploring'&&!shopping;
+ for(const b of directionButtons)b.disabled=busy||touchControls.hidden;
+ for(const b of touchDirections.querySelectorAll('button')){
+  const dx=Number(b.dataset.dx),dy=Number(b.dataset.dy);
+  b.disabled=touchControls.hidden;
+  b.setAttribute('aria-disabled',String((shopping&&!dx&&!dy)||(!run.rootedMap&&!run.canStep(dx,dy))));
+ }
+ for(const id of ['fight','retreat','next-floor','new-run','touch-new-run'])$(id).disabled=busy;
+ $('touch-new-run').hidden=shopping;
+ root.querySelector('.map-touch-camera').hidden=shopping;
+ if($('touch-map-status').textContent!==run.message)$('touch-map-status').textContent=run.message;
  $('map').setAttribute('aria-busy',String(busy));
  $('map-dialogs').hidden=!(['reward','boss-reward','encounter','battle','cleared','defeat','victory'].includes(run.stage)||isMerchantStage(run.stage)&&merchantUI.modalOpen);
  merchantUI.render();
@@ -238,14 +252,18 @@ $('map').addEventListener('click',event=>{if(mapTools.consumeClick(event.target)
  if(!dx&&!dy){if(isShopping(run.stage)){buy();return;}const merchant=run.merchants?.find(m=>m.x===run.player.x&&m.y===run.player.y);if(merchant){apply(()=>{run.openMerchant(merchant);},{animate:false});return;}selected=!selected;renderMap();return;}apply(()=>run.step(dx,dy));
 });
 $('inventory').addEventListener('click',event=>editor.consumeClick(event.target));
-for(const b of document.querySelectorAll('.dpad button'))b.addEventListener('click',()=>apply(()=>run.step(Number(b.dataset.dx),Number(b.dataset.dy))));
-keyboard=setupMapKeyboard({scope,viewport:$('map-viewport'),dialogs:$('map-dialogs'),getStage:()=>run.stage,isBusy:()=>busy,isBlocked:()=>debug.isOpen||mapTools.placing||editor.editing||runPicker.isOpen,
+for(const b of directionButtons)b.addEventListener('click',()=>apply(()=>run.step(Number(b.dataset.dx),Number(b.dataset.dy))));
+keyboard=setupMapKeyboard({scope,viewport:$('map-viewport'),dialogs:$('map-dialogs'),directionControls:touchDirections,getStage:()=>run.stage,isBusy:()=>busy,isBlocked:()=>debug.isOpen||mapTools.placing||editor.editing||runPicker.isOpen,
  canRestart:()=>run.act===1&&run.floor===1&&run.stage==='exploring',restart:()=>apply(()=>{run=new Run(undefined,1,run.difficulty);},{animate:false}),
  changeVariation:()=>apply(()=>{const changed=changeActVariation(run);if(changed){cameraFloor=null;cameraPlayer=null;}return changed;},{animate:false}),
  step:(dx,dy)=>isShopping(run.stage)&&!dx&&!dy?buy():apply(()=>run.step(dx,dy)),selectKing:()=>{if(isShopping(run.stage)){buy();return;}const merchant=run.merchants?.find(m=>m.x===run.player.x&&m.y===run.player.y);if(merchant){apply(()=>run.openMerchant(merchant),{animate:false});return;}selected=!selected;renderMap();camera.center(run.player);},center:()=>camera.center(run.player)});
  function buy(){if(isMerchantStage(run.stage)){merchantUI.requestPurchase();return;}const item=run.shop?.items.find(i=>i.x===run.player.x&&i.y===run.player.y&&!i.sold);if(item)apply(()=>run.buyShop(item.id),{animate:false});}
  $('shop-buy').addEventListener('click',()=>{buy();$('map-viewport').focus();});
 $('center-camera').addEventListener('click',()=>camera.center(run.player));
+$('touch-center').addEventListener('click',()=>camera.center(run.player));
+$('touch-zoom-in').addEventListener('click',()=>camera.changeZoom(1.25));
+$('touch-zoom-out').addEventListener('click',()=>camera.changeZoom(.8));
+$('touch-new-run').addEventListener('click',()=>runPicker.open());
 $('fight').addEventListener('click',()=>navigate(`./deployment.html?run=${encodeURIComponent(run.id)}`));
 $('retreat').addEventListener('click',()=>apply(()=>run.retreat()));$('next-floor').addEventListener('click',()=>apply(()=>run.nextFloor(),{animate:false}));
 $('new-run').addEventListener('click',()=>runPicker.open());

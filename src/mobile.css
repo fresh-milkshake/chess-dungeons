@@ -1,0 +1,19 @@
+@media(max-width:760px){
+  .header{height:auto;min-height:66px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 8px;padding:6px 12px}
+  .header .brand{grid-column:1/-1;grid-row:1;justify-self:center;white-space:nowrap}
+  .header .source-link{margin:0;min-height:44px;display:grid;place-items:center;text-align:center}
+  .game-layout{margin-top:10px;gap:16px}
+  .arena .player{height:40px;margin-block:3px}
+  .board-footer{margin-top:4px}
+  .board-footer button,.game-panel :is(select,.primary-button,.secondary-button){min-height:44px}
+  .promotion-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .promotion-options button{width:100%;height:auto;aspect-ratio:1}
+}
+
+@media(max-width:640px), (pointer:coarse){
+  .game-audio-controls{right:max(8px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top))}
+  .game-audio-toggle{width:44px;height:44px}
+  .game-audio-panel{top:50px;max-height:calc(100dvh - 70px);overflow:auto;overscroll-behavior:contain}
+  .game-audio-panel input[type=range]{height:24px;margin:0}
+  .game-audio-panel label{margin-bottom:9px}
+}

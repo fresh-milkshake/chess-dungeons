@@ -3,7 +3,7 @@ import './relics.css';
 import {artifactIcon} from '../artifacts/icon-effects.js';
 
 export function setupRelicDebug({root,scope,getState,onChange,onReset,isBusy=()=>false}){
- const panel=root.querySelector('#debug-panel');
+ const panel=root.querySelector('.debug-panel');
  const section=document.createElement('section');section.className='debug-relics';
  const heading=document.createElement('h3');heading.textContent='Реликвии';section.append(heading);
  const list=document.createElement('div');list.className='debug-relic-list';

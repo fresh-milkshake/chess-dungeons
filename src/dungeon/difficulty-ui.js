@@ -7,7 +7,7 @@ export function renderEloCaption(anchor,profile){
  caption.hidden=!readDifficultyDebug().show;caption.textContent=`≈ ${profile.elo} Elo`;caption.title='Предполагаемая шахматная сила. Для особых правил — предварительная оценка, требующая калибровки.';
 }
 export function setupDifficultyDebug({root,scope,getDifficulty,onChange,getProfile}){
- const panel=root.querySelector('#debug-panel'),section=document.createElement('section');section.className='difficulty-debug';
+ const panel=root.querySelector('.debug-panel'),section=document.createElement('section');section.className='difficulty-debug';
  section.innerHTML='<h3>Сложность ИИ</h3><label><input type="checkbox" class="elo-manual"> Ручная настройка Elo</label><label class="elo-range-label">Предполагаемая сила <output></output><input class="elo-range" aria-label="Сложность противника в Elo" type="range" min="100" max="2850" step="50"></label><label><input type="checkbox" class="elo-show"> Показывать Elo перед боем</label><p>Обычные правила: штатный UCI Elo. Особые правила: предварительная оценка; нужна калибровка партий.</p>';
  panel.append(section);const manual=section.querySelector('.elo-manual'),slider=section.querySelector('.elo-range'),output=section.querySelector('output'),show=section.querySelector('.elo-show');
  const refresh=()=>{const d=normalizeDifficulty(getDifficulty()),prefs=readDifficultyDebug();manual.checked=d.overrideElo!==null;slider.value=String(d.overrideElo??prefs.elo);slider.disabled=!manual.checked;output.value=slider.value+' Elo';show.checked=prefs.show;};

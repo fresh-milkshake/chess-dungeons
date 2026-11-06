@@ -8,6 +8,7 @@ import { pieceSets, defaultPieceSet, pieceImage } from './piece-sets.js';
 import { minElo, maxElo, defaultElo, nativeMinElo, normalizeElo, chooseOpponentMove } from './engine-strength.js';
 import { createMoveAnimation, createMoveSound } from './move-effects.js';
 import './style.css';
+import './mobile.css';
 
 const $ = (id) => document.getElementById(id);
 const game = new Chess();
@@ -334,6 +335,7 @@ $('board').addEventListener('keydown', (event) => {
 });
 $('promotion').addEventListener('cancel', () => { pendingPromotion = null; });
 $('board').addEventListener('pointerdown', moveSound.unlock, { capture: true });
+$('board').addEventListener('pointerup', event => { if (event.pointerType === 'touch') moveSound.unlock(); }, { capture: true });
 $('board').addEventListener('keydown', moveSound.unlock, { capture: true });
 $('mode').addEventListener('pointerdown', moveSound.unlock);
 $('mode').addEventListener('keydown', moveSound.unlock);

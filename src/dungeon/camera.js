@@ -75,12 +75,16 @@ export function createCamera(viewport,board,{canPan=()=>true,scope=createScope()
  scope.on(viewport,'pointercancel',endPan);
  scope.on(viewport,'lostpointercapture',endPan);
  scope.on(window,'pointerup',endPan);
+ function changeZoom(factor,point={x:width/2,y:height/2}){
+  if(!canPan())return;
+  cancelFollow();
+  ({x,y,zoom}=zoomAt({x,y,zoom},point,zoom*factor));paint();
+ }
  scope.on(viewport,'wheel',event=>{
   if(event.ctrlKey||!canPan())return;
-  event.preventDefault();cancelFollow();
+  event.preventDefault();
   const rect=viewport.getBoundingClientRect(),delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?viewport.clientHeight:1);
-  const next=zoomAt({x,y,zoom},{x:event.clientX-rect.left,y:event.clientY-rect.top},zoom*Math.exp(-delta*.0015));
-  ({x,y,zoom}=next);paint();
+  changeZoom(Math.exp(-delta*.0015),{x:event.clientX-rect.left,y:event.clientY-rect.top});
  },{passive:false});
  function stop(){cancelFollow();endPan();}
  scope.on(window,'blur',stop);
@@ -89,5 +93,5 @@ export function createCamera(viewport,board,{canPan=()=>true,scope=createScope()
  function refresh(){if(!scope.active||!viewport.clientWidth||!viewport.clientHeight)return;cancelFollow();x+=(viewport.clientWidth-width)/2;y+=(viewport.clientHeight-height)/2;width=viewport.clientWidth;height=viewport.clientHeight;baseTile=parseFloat(getComputedStyle(viewport).getPropertyValue('--tile'))||72;paint();}
  const observer=new ResizeObserver(refresh);observer.observe(viewport);
  scope.onPause(stop);scope.cleanup(()=>observer.disconnect());
- return {center,follow,stop,refresh,suppressClick:()=>performance.now()<suppressClickUntil};
+ return {center,follow,stop,refresh,changeZoom,suppressClick:()=>performance.now()<suppressClickUntil};
 }

@@ -1,7 +1,12 @@
 <!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chess Dungeons · Бой</title><link rel="icon" href="./favicon.svg"></head><body class="battle-page">
 <main class="battle-stage"><section class="battle-arena"><div id="board" class="board" role="group" aria-label="Боевая доска"></div><section id="result" class="battle-result" aria-live="polite" hidden><div class="result-card"><div class="chapter">БОЙ ЗАВЕРШЁН</div><h2 id="result-title"></h2><p id="result-detail"></p><p id="result-reward" class="result-reward"></p><p id="result-trophy" class="result-reward" hidden></p><button id="again" disabled class="primary-button">Выйти из боя</button></div></section></section></main>
-<button id="debug-toggle" class="debug-toggle" aria-controls="debug-panel" aria-expanded="false">DEBUG · D</button>
-<aside id="debug-panel" class="debug-panel" aria-label="Отладка боя" hidden><div class="debug-heading">DEBUG · БОЙ<button id="debug-close" aria-label="Закрыть дебаг-меню">×</button></div>
+<footer class="battle-touch-controls" aria-label="Управление боем">
+ <p id="touch-battle-turn" role="status">Загрузка боя…</p>
+ <button type="button" id="touch-battle-undo" class="secondary-button" disabled>Отменить ход</button>
+ <button type="button" id="touch-battle-menu" class="secondary-button" aria-controls="battle-menu-panel" aria-expanded="false">Меню боя</button>
+</footer>
+<button id="debug-toggle" class="debug-toggle" aria-controls="battle-menu-panel" aria-expanded="false">DEBUG · D</button>
+<aside id="battle-menu-panel" class="debug-panel" aria-label="Отладка боя" hidden><div class="debug-heading">DEBUG · БОЙ<button id="debug-close" aria-label="Закрыть дебаг-меню">×</button></div>
 <div class="lab-board-label"><span id="turn" aria-live="polite">Загрузка боя…</span><button id="flip" disabled class="text-button">Перевернуть ↻</button></div>
 <section class="game-panel"><label class="mode-label" for="battle-preset">Состав армий</label><select id="battle-preset" disabled></select><p id="description" class="lab-description"></p>
 <label class="mode-label" for="depth">Противник · глубина поиска</label><select id="depth" disabled><option value="3">3 · Быстрый</option><option value="5" selected>5 · Обычный</option><option value="7">7 · Глубокий</option><option value="9">9 · Тщательный</option></select>
